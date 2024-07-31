@@ -1,5 +1,3 @@
-# flask_app.py
-
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 import pandas as pd
@@ -38,7 +36,10 @@ model_encoder.fit(laptops['model'])
 @app.route('/api/recommend_laptop', methods=['POST'])
 def recommend_laptop():
     data = request.json
-    employee_name = data['name']
+    employee_name = data.get('name')
+
+    if not employee_name:
+        return jsonify({'error': 'Missing employee name'}), 400
 
     # Fetch employee details
     employee = db.Employees.find_one({'name': employee_name})
@@ -46,7 +47,10 @@ def recommend_laptop():
         return jsonify({'error': 'Employee not found'}), 404
 
     # Encode employee role
-    employee_role = role_encoder.transform([employee['role']])[0]
+    try:
+        employee_role = role_encoder.transform([employee['role']])[0]
+    except ValueError:
+        return jsonify({'error': 'Invalid employee role'}), 400
 
     # Predict laptop model
     X = pd.DataFrame([[employee_role, 0, 0]], columns=['role', 'status', 'location'])
@@ -68,11 +72,20 @@ def recommend_laptop():
 @app.route('/api/reserve_laptop', methods=['POST'])
 def reserve_laptop():
     data = request.json
-    manager_name = data['manager_name']
-    employee_name = data['employee_name']
-    model = data['model']
-    start_date = datetime.strptime(data['start_date'], '%Y-%m-%d')
-    end_date = datetime.strptime(data['end_date'], '%Y-%m-%d')
+    manager_name = data.get('manager_name')
+    employee_name = data.get('employee_name')
+    model = data.get('model')
+    start_date = data.get('start_date')
+    end_date = data.get('end_date')
+
+    if not all([manager_name, employee_name, model, start_date, end_date]):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    try:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    except ValueError:
+        return jsonify({'error': 'Invalid date format'}), 400
 
     # Check laptop availability for reservation period
     reserved_laptop = db.Laptops.find_one({'model': model, 'status': 'available'})
@@ -106,13 +119,21 @@ def predict_maintenance():
 @app.route('/api/onboard_employee', methods=['POST'])
 def onboard_employee():
     data = request.json
-    name = data['name']
-    role = data['role']
-    email = data['email']
-    date_joined = datetime.strptime(data['dateJoined'], '%Y-%m-%d')
+    name = data.get('name')
+    role = data.get('role')
+    email = data.get('email')
+    date_joined = data.get('dateJoined')
+
+    if not all([name, role, email, date_joined]):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    try:
+        date_joined = datetime.strptime(date_joined, '%Y-%m-%d')
+    except ValueError:
+        return jsonify({'error': 'Invalid date format'}), 400
 
     # Add employee to database
-    db.Employees.insert_one({
+    result = db.Employees.insert_one({
         'name': name,
         'role': role,
         'email': email,
@@ -120,7 +141,11 @@ def onboard_employee():
     })
 
     # Automatically assign laptop
-    encoded_role = role_encoder.transform([role])[0]
+    try:
+        encoded_role = role_encoder.transform([role])[0]
+    except ValueError:
+        return jsonify({'error': 'Invalid role for laptop assignment'}), 400
+
     X = pd.DataFrame([[encoded_role, 0, 0]], columns=['role', 'status', 'location'])
     recommended_model_code = smart_assignment_model.predict(X)[0]
     recommended_model = model_encoder.inverse_transform([recommended_model_code])[0]
