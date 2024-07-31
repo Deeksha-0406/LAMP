@@ -1,0 +1,90 @@
+[{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db4609"
+  },
+  "name": "Alice Johnson",
+  "role": "Project Manager",
+  "email": "alice.johnson@example.com",
+  "dateJoined": "2022-03-15T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db460a"
+  },
+  "name": "Bob Smith",
+  "role": "Developer",
+  "email": "bob.smith@example.com",
+  "dateJoined": "2021-07-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db460b"
+  },
+  "name": "Carol White",
+  "role": "Tester",
+  "email": "carol.white@example.com",
+  "dateJoined": "2022-01-10T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db460c"
+  },
+  "name": "David Brown",
+  "role": "Developer",
+  "email": "david.brown@example.com",
+  "dateJoined": "2020-09-05T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db460d"
+  },
+  "name": "Eve Black",
+  "role": "UX Designer",
+  "email": "eve.black@example.com",
+  "dateJoined": "2023-05-20T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db460e"
+  },
+  "name": "Frank Green",
+  "role": "Developer",
+  "email": "frank.green@example.com",
+  "dateJoined": "2022-08-25T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db460f"
+  },
+  "name": "Grace Taylor",
+  "role": "Business Analyst",
+  "email": "grace.taylor@example.com",
+  "dateJoined": "2021-11-15T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db4610"
+  },
+  "name": "Henry Adams",
+  "role": "Tester",
+  "email": "henry.adams@example.com",
+  "dateJoined": "2023-02-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db4611"
+  },
+  "name": "Ivy Wilson",
+  "role": "Product Owner",
+  "email": "ivy.wilson@example.com",
+  "dateJoined": "2021-03-30T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4ac26afb412d0db4612"
+  },
+  "name": "Jack Miller",
+  "role": "Developer",
+  "email": "jack.miller@example.com",
+  "dateJoined": "2020-07-20T00:00:00Z"
+}]

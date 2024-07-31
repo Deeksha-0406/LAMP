@@ -1,0 +1,110 @@
+[{
+  "_id": {
+    "$oid": "66a0a41026afb412d0db4606"
+  },
+  "serialNumber": "SN123456",
+  "model": "Dell XPS 13",
+  "assignedTo": "Alice Johnson",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2023-07-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4c426afb412d0db4615"
+  },
+  "serialNumber": "SN123457",
+  "model": "MacBook Pro 13",
+  "assignedTo": "Alice Johnson",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2023-06-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4c426afb412d0db4616"
+  },
+  "serialNumber": "SN123458",
+  "model": "Dell XPS 15",
+  "assignedTo": "Alice Johnson",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2023-05-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4c426afb412d0db4617"
+  },
+  "serialNumber": "SN123459",
+  "model": "HP Spectre x360",
+  "assignedTo": "Bob Smith",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2023-07-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4c426afb412d0db4618"
+  },
+  "serialNumber": "SN123460",
+  "model": "Lenovo ThinkPad X1",
+  "assignedTo": "Bob Smith",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2023-04-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4c426afb412d0db4619"
+  },
+  "serialNumber": "SN123461",
+  "model": "Acer Swift 3",
+  "assignedTo": "Ivy Wilson",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2023-03-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4c426afb412d0db461a"
+  },
+  "serialNumber": "SN123462",
+  "model": "Microsoft Surface Laptop 4",
+  "assignedTo": "Alice Johnson",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2023-02-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4c426afb412d0db461b"
+  },
+  "serialNumber": "SN123463",
+  "model": "Asus ZenBook 14",
+  "assignedTo": "Alice Johnson",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2023-01-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4c426afb412d0db461c"
+  },
+  "serialNumber": "SN123464",
+  "model": "Google Pixelbook Go",
+  "assignedTo": "Henry Adams",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2022-12-01T00:00:00Z"
+},
+{
+  "_id": {
+    "$oid": "66a0a4c426afb412d0db461d"
+  },
+  "serialNumber": "SN123465",
+  "model": "Razer Blade Stealth 13",
+  "assignedTo": "Henry Adams",
+  "status": "assigned",
+  "location": "Office",
+  "lastServiced": "2022-11-01T00:00:00Z"
+}]
