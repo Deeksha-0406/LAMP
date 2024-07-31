@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAMP System</title>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <h1>LAMP System</h1>
+
+    <h2>Assign Laptop</h2>
+    <form id="assignLaptopForm">
+        <label for="employeeName">Employee Name:</label>
+        <input type="text" id="employeeName" name="employeeName" required>
+        <button type="submit">Assign Laptop</button>
+    </form>
+    <div id="assignLaptopResult"></div>
+
+    <h2>Reserve Laptop</h2>
+    <form id="reserveLaptopForm">
+        <label for="managerName">Manager Name:</label>
+        <input type="text" id="managerName" name="managerName" required>
+        <label for="employeeNameReserve">Employee Name:</label>
+        <input type="text" id="employeeNameReserve" name="employeeNameReserve" required>
+        <label for="model">Model:</label>
+        <input type="text" id="model" name="model" required>
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" name="startDate" required>
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" name="endDate" required>
+        <button type="submit">Reserve Laptop</button>
+    </form>
+    <div id="reserveLaptopResult"></div>
+
+    <h2>Predict Maintenance</h2>
+    <button id="predictMaintenanceButton">Predict Maintenance</button>
+    <div id="predictMaintenanceResult"></div>
+
+    <h2>Onboard Employee</h2>
+    <form id="onboardEmployeeForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="role">Role:</label>
+        <input type="text" id="role" name="role" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="dateJoined">Date Joined:</label>
+        <input type="date" id="dateJoined" name="dateJoined" required>
+        <button type="submit">Onboard Employee</button>
+    </form>
+    <div id="onboardEmployeeResult"></div>
+
+</body>
+</html>
