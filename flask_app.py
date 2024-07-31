@@ -4,8 +4,12 @@ import pandas as pd
 import pickle
 from sklearn.preprocessing import LabelEncoder
 from datetime import datetime
+import logging
 
 app = Flask(__name__)
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Connect to MongoDB
 client = MongoClient('mongodb://localhost:27017/')
@@ -61,11 +65,18 @@ def recommend_laptop():
     available_laptop = db.Laptops.find_one({'model': recommended_model, 'status': 'available'})
     if available_laptop:
         # Update laptop details
-        db.Laptops.update_one(
+        result = db.Laptops.update_one(
             {'_id': available_laptop['_id']},
-            {'$set': {'assignedTo': employee_name, 'status': 'assigned', 'lastUpdated': datetime.now()}}
+            {'$set': {
+                'assignedTo': employee_name,
+                'status': 'assigned',
+                'lastUpdated': datetime.now()
+            }}
         )
-        return jsonify({'message': f'Laptop {available_laptop["serialNumber"]} assigned to {employee_name}'}), 200
+        if result.modified_count > 0:
+            return jsonify({'message': f'Laptop {available_laptop["serialNumber"]} assigned to {employee_name}'}), 200
+        else:
+            return jsonify({'error': 'Failed to update laptop details'}), 500
     else:
         return jsonify({'message': 'No available laptops for the recommended model'}), 200
 
@@ -91,7 +102,7 @@ def reserve_laptop():
     reserved_laptop = db.Laptops.find_one({'model': model, 'status': 'available'})
     if reserved_laptop:
         # Update laptop details to reflect reservation
-        db.Laptops.update_one(
+        result = db.Laptops.update_one(
             {'_id': reserved_laptop['_id']},
             {'$set': {
                 'status': 'reserved',
@@ -104,7 +115,10 @@ def reserve_laptop():
                 'lastUpdated': datetime.now()
             }}
         )
-        return jsonify({'message': f'Laptop {reserved_laptop["serialNumber"]} reserved for {employee_name} by {manager_name}'}), 200
+        if result.modified_count > 0:
+            return jsonify({'message': f'Laptop {reserved_laptop["serialNumber"]} reserved for {employee_name} by {manager_name}'}), 200
+        else:
+            return jsonify({'error': 'Failed to update laptop details'}), 500
     else:
         return jsonify({'message': 'No available laptops for reservation'}), 200
 
@@ -163,7 +177,7 @@ def onboard_employee():
 
     available_laptop = db.Laptops.find_one({'model': recommended_model, 'status': 'available'})
     if available_laptop:
-        db.Laptops.update_one(
+        result = db.Laptops.update_one(
             {'_id': available_laptop['_id']},
             {'$set': {
                 'assignedTo': name,
@@ -171,7 +185,10 @@ def onboard_employee():
                 'lastUpdated': datetime.now()
             }}
         )
-        return jsonify({'message': f'Laptop {available_laptop["serialNumber"]} assigned to {name}'}), 200
+        if result.modified_count > 0:
+            return jsonify({'message': f'Laptop {available_laptop["serialNumber"]} assigned to {name}'}), 200
+        else:
+            return jsonify({'error': 'Failed to update laptop details'}), 500
     else:
         return jsonify({'message': 'No available laptops for the recommended model'}), 200
 
