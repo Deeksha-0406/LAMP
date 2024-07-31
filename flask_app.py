@@ -60,10 +60,10 @@ def recommend_laptop():
     # Check laptop availability
     available_laptop = db.Laptops.find_one({'model': recommended_model, 'status': 'available'})
     if available_laptop:
-        # Update laptop status
+        # Update laptop details
         db.Laptops.update_one(
             {'_id': available_laptop['_id']},
-            {'$set': {'assignedTo': employee_name, 'status': 'assigned'}}
+            {'$set': {'assignedTo': employee_name, 'status': 'assigned', 'lastUpdated': datetime.now()}}
         )
         return jsonify({'message': f'Laptop {available_laptop["serialNumber"]} assigned to {employee_name}'}), 200
     else:
@@ -90,10 +90,19 @@ def reserve_laptop():
     # Check laptop availability for reservation period
     reserved_laptop = db.Laptops.find_one({'model': model, 'status': 'available'})
     if reserved_laptop:
-        # Update laptop status to reserved
+        # Update laptop details to reflect reservation
         db.Laptops.update_one(
             {'_id': reserved_laptop['_id']},
-            {'$set': {'status': 'reserved', 'assignedTo': employee_name}}
+            {'$set': {
+                'status': 'reserved',
+                'assignedTo': employee_name,
+                'reservation': {
+                    'manager': manager_name,
+                    'startDate': start_date,
+                    'endDate': end_date
+                },
+                'lastUpdated': datetime.now()
+            }}
         )
         return jsonify({'message': f'Laptop {reserved_laptop["serialNumber"]} reserved for {employee_name} by {manager_name}'}), 200
     else:
@@ -139,6 +148,8 @@ def onboard_employee():
         'email': email,
         'dateJoined': date_joined
     })
+    if not result.acknowledged:
+        return jsonify({'error': 'Failed to add employee'}), 500
 
     # Automatically assign laptop
     try:
@@ -154,7 +165,11 @@ def onboard_employee():
     if available_laptop:
         db.Laptops.update_one(
             {'_id': available_laptop['_id']},
-            {'$set': {'assignedTo': name, 'status': 'assigned'}}
+            {'$set': {
+                'assignedTo': name,
+                'status': 'assigned',
+                'lastUpdated': datetime.now()
+            }}
         )
         return jsonify({'message': f'Laptop {available_laptop["serialNumber"]} assigned to {name}'}), 200
     else:
