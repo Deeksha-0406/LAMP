@@ -4,12 +4,8 @@ import pandas as pd
 import pickle
 from sklearn.preprocessing import LabelEncoder
 from datetime import datetime
-import logging
 
 app = Flask(__name__)
-
-# Set up logging
-logging.basicConfig(level=logging.DEBUG)
 
 # Connect to MongoDB
 client = MongoClient('mongodb://localhost:27017/')
@@ -36,6 +32,10 @@ role_encoder.fit(employees['role'])
 status_encoder.fit(laptops['status'])
 location_encoder.fit(laptops['location'])
 model_encoder.fit(laptops['model'])
+
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
 
 @app.route('/api/recommend_laptop', methods=['POST'])
 def recommend_laptop():
@@ -64,19 +64,15 @@ def recommend_laptop():
     # Check laptop availability
     available_laptop = db.Laptops.find_one({'model': recommended_model, 'status': 'available'})
     if available_laptop:
-        # Update laptop details
-        result = db.Laptops.update_one(
+        # Update laptop status
+        db.Laptops.update_one(
             {'_id': available_laptop['_id']},
-            {'$set': {
-                'assignedTo': employee_name,
-                'status': 'assigned',
-                'lastUpdated': datetime.now()
-            }}
+            {'$set': {'assignedTo': employee_name, 'status': 'assigned'}}
         )
-        if result.modified_count > 0:
-            return jsonify({'message': f'Laptop {available_laptop["serialNumber"]} assigned to {employee_name}'}), 200
-        else:
-            return jsonify({'error': 'Failed to update laptop details'}), 500
+        return jsonify({
+            'message': f'Laptop {available_laptop["model"]} assigned to {employee_name}',
+            'laptop': available_laptop
+        }), 200
     else:
         return jsonify({'message': 'No available laptops for the recommended model'}), 200
 
@@ -101,24 +97,12 @@ def reserve_laptop():
     # Check laptop availability for reservation period
     reserved_laptop = db.Laptops.find_one({'model': model, 'status': 'available'})
     if reserved_laptop:
-        # Update laptop details to reflect reservation
-        result = db.Laptops.update_one(
+        # Update laptop status to reserved
+        db.Laptops.update_one(
             {'_id': reserved_laptop['_id']},
-            {'$set': {
-                'status': 'reserved',
-                'assignedTo': employee_name,
-                'reservation': {
-                    'manager': manager_name,
-                    'startDate': start_date,
-                    'endDate': end_date
-                },
-                'lastUpdated': datetime.now()
-            }}
+            {'$set': {'status': 'reserved', 'assignedTo': employee_name, 'reservationStartDate': start_date, 'reservationEndDate': end_date}}
         )
-        if result.modified_count > 0:
-            return jsonify({'message': f'Laptop {reserved_laptop["serialNumber"]} reserved for {employee_name} by {manager_name}'}), 200
-        else:
-            return jsonify({'error': 'Failed to update laptop details'}), 500
+        return jsonify({'message': f'Laptop {reserved_laptop["model"]} reserved for {employee_name} by {manager_name}'}), 200
     else:
         return jsonify({'message': 'No available laptops for reservation'}), 200
 
@@ -150,47 +134,15 @@ def onboard_employee():
     if not all([name, role, email, date_joined]):
         return jsonify({'error': 'Missing required fields'}), 400
 
-    try:
-        date_joined = datetime.strptime(date_joined, '%Y-%m-%d')
-    except ValueError:
-        return jsonify({'error': 'Invalid date format'}), 400
-
-    # Add employee to database
-    result = db.Employees.insert_one({
+    # Add new employee to the database
+    db.Employees.insert_one({
         'name': name,
         'role': role,
         'email': email,
         'dateJoined': date_joined
     })
-    if not result.acknowledged:
-        return jsonify({'error': 'Failed to add employee'}), 500
 
-    # Automatically assign laptop
-    try:
-        encoded_role = role_encoder.transform([role])[0]
-    except ValueError:
-        return jsonify({'error': 'Invalid role for laptop assignment'}), 400
-
-    X = pd.DataFrame([[encoded_role, 0, 0]], columns=['role', 'status', 'location'])
-    recommended_model_code = smart_assignment_model.predict(X)[0]
-    recommended_model = model_encoder.inverse_transform([recommended_model_code])[0]
-
-    available_laptop = db.Laptops.find_one({'model': recommended_model, 'status': 'available'})
-    if available_laptop:
-        result = db.Laptops.update_one(
-            {'_id': available_laptop['_id']},
-            {'$set': {
-                'assignedTo': name,
-                'status': 'assigned',
-                'lastUpdated': datetime.now()
-            }}
-        )
-        if result.modified_count > 0:
-            return jsonify({'message': f'Laptop {available_laptop["serialNumber"]} assigned to {name}'}), 200
-        else:
-            return jsonify({'error': 'Failed to update laptop details'}), 500
-    else:
-        return jsonify({'message': 'No available laptops for the recommended model'}), 200
+    return jsonify({'message': f'Employee {name} onboarded successfully'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
