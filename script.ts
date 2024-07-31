@@ -1,91 +1,102 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle laptop assignment form submission
-    document.getElementById('assignLaptopForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const employeeName = document.getElementById('employeeName').value;
+async function recommendLaptop() {
+    const employeeName = document.getElementById('employeeName').value;
+    const resultDiv = document.getElementById('recommendationResult');
 
-        fetch('/api/assignLaptop', {
+    if (!employeeName) {
+        resultDiv.innerText = 'Employee name is required.';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/recommend_laptop', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ employeeName })
-        })
-        .then(response => response.text())
-        .then(data => {
-            console.log('Assign Laptop response:', data); // Debugging line
-            document.getElementById('assignLaptopResult').innerText = data;
-        })
-        .catch(error => {
-            console.error('Fetch error:', error); // Debugging line
-            document.getElementById('assignLaptopResult').innerText = 'Error: ' + error;
+            body: JSON.stringify({ name: employeeName })
         });
-    });
+        const data = await response.json();
 
-    // Handle laptop reservation form submission
-    document.getElementById('reserveLaptopForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const managerName = document.getElementById('managerName').value;
-        const employeeName = document.getElementById('employeeNameReserve').value;
-        const model = document.getElementById('model').value;
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
+        if (response.ok) {
+            resultDiv.innerHTML = `
+                <p>${data.message}</p>
+                ${data.laptop ? `
+                    <p><strong>Recommended Laptop Details:</strong></p>
+                    <p>Model: ${data.laptop.model}</p>
+                    <p>Serial Number: ${data.laptop.serialNumber}</p>
+                    <p>Location: ${data.laptop.location}</p>
+                    <p>Last Serviced: ${data.laptop.lastServiced}</p>
+                ` : ''}
+            `;
+        } else {
+            resultDiv.innerText = 'Error: ' + data.error;
+        }
+    } catch (error) {
+        resultDiv.innerText = 'Error: ' + error.message;
+    }
+}
 
-        fetch('/api/reserve_laptop', {
+async function reserveLaptop() {
+    const managerName = document.getElementById('reserveManagerName').value;
+    const employeeName = document.getElementById('reserveEmployeeName').value;
+    const model = document.getElementById('reserveModel').value;
+    const startDate = document.getElementById('reserveStartDate').value;
+    const endDate = document.getElementById('reserveEndDate').value;
+    const resultDiv = document.getElementById('reservationResult');
+
+    if (!managerName || !employeeName || !model || !startDate || !endDate) {
+        resultDiv.innerText = 'All fields are required.';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/reserve_laptop', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ managerName, employeeName, model, startDate, endDate })
-        })
-        .then(response => response.text())
-        .then(data => {
-            console.log('Reserve Laptop response:', data); // Debugging line
-            document.getElementById('reserveLaptopResult').innerText = data;
-        })
-        .catch(error => {
-            console.error('Fetch error:', error); // Debugging line
-            document.getElementById('reserveLaptopResult').innerText = 'Error: ' + error;
+            body: JSON.stringify({ manager_name: managerName, employee_name: employeeName, model: model, start_date: startDate, end_date: endDate })
         });
-    });
+        const data = await response.json();
 
-    // Handle predict maintenance button click
-    document.getElementById('predictMaintenanceButton').addEventListener('click', function() {
-        fetch('/api/predictMaintenance')
-        .then(response => response.json())
-        .then(data => {
-            console.log('Predict Maintenance response:', data); // Debugging line
-            document.getElementById('predictMaintenanceResult').innerText = JSON.stringify(data, null, 2);
-        })
-        .catch(error => {
-            console.error('Fetch error:', error); // Debugging line
-            document.getElementById('predictMaintenanceResult').innerText = 'Error: ' + error;
-        });
-    });
+        if (response.ok) {
+            resultDiv.innerHTML = `<p>${data.message}</p>`;
+        } else {
+            resultDiv.innerText = 'Error: ' + data.error;
+        }
+    } catch (error) {
+        resultDiv.innerText = 'Error: ' + error.message;
+    }
+}
 
-    // Handle employee onboarding form submission
-    document.getElementById('onboardEmployeeForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const name = document.getElementById('name').value;
-        const role = document.getElementById('role').value;
-        const email = document.getElementById('email').value;
-        const dateJoined = document.getElementById('dateJoined').value;
+async function onboardEmployee() {
+    const name = document.getElementById('onboardName').value;
+    const role = document.getElementById('onboardRole').value;
+    const email = document.getElementById('onboardEmail').value;
+    const dateJoined = document.getElementById('onboardDateJoined').value;
+    const resultDiv = document.getElementById('onboardingResult');
 
-        fetch('/api/onboard_employee', {
+    if (!name || !role || !email || !dateJoined) {
+        resultDiv.innerText = 'All fields are required.';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/onboard_employee', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ name, role, email, dateJoined })
-        })
-        .then(response => response.text())
-        .then(data => {
-            console.log('Onboard Employee response:', data); // Debugging line
-            document.getElementById('onboardEmployeeResult').innerText = data;
-        })
-        .catch(error => {
-            console.error('Fetch error:', error); // Debugging line
-            document.getElementById('onboardEmployeeResult').innerText = 'Error: ' + error;
+            body: JSON.stringify({ name: name, role: role, email: email, dateJoined: dateJoined })
         });
-    });
-});
+        const data = await response.json();
+
+        if (response.ok) {
+            resultDiv.innerHTML = `<p>${data.message}</p>`;
+        } else {
+            resultDiv.innerText = 'Error: ' + data.error;
+        }
+    } catch (error) {
+        resultDiv.innerText = 'Error: ' + error.message;
+    }
+}
