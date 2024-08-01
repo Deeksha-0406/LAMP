@@ -1,0 +1,228 @@
+[{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1b1"
+  },
+  "serialNumber": "SN123456",
+  "model": "Dell XPS 15",
+  "brand": "Dell",
+  "specifications": {
+    "cpu": "Intel Core i7",
+    "ram": "16GB",
+    "storage": "512GB SSD",
+    "graphics": "Intel UHD Graphics"
+  },
+  "status": "Available",
+  "location": "NYC Office",
+  "age": 2,
+  "condition": "Good",
+  "lastServiced": "2023-06-15"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1b2"
+  },
+  "serialNumber": "SN654321",
+  "model": "MacBook Pro",
+  "brand": "Apple",
+  "specifications": {
+    "cpu": "Apple M1",
+    "ram": "16GB",
+    "storage": "512GB SSD",
+    "graphics": "Apple M1"
+  },
+  "status": "Assigned",
+  "location": "LA Office",
+  "age": 1,
+  "condition": "Excellent",
+  "lastServiced": "2023-04-10"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1b3"
+  },
+  "serialNumber": "SN112233",
+  "model": "HP Spectre x360",
+  "brand": "HP",
+  "specifications": {
+    "cpu": "Intel Core i5",
+    "ram": "8GB",
+    "storage": "256GB SSD",
+    "graphics": "Intel UHD Graphics"
+  },
+  "status": "Available",
+  "location": "SF Office",
+  "age": 3,
+  "condition": "Fair",
+  "lastServiced": "2022-12-20"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1b4"
+  },
+  "serialNumber": "SN445566",
+  "model": "Lenovo ThinkPad X1 Carbon",
+  "brand": "Lenovo",
+  "specifications": {
+    "cpu": "Intel Core i7",
+    "ram": "16GB",
+    "storage": "512GB SSD",
+    "graphics": "Intel UHD Graphics"
+  },
+  "status": "In Service",
+  "location": "NYC Office",
+  "age": 4,
+  "condition": "Good",
+  "lastServiced": "2023-07-01"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1b5"
+  },
+  "serialNumber": "SN778899",
+  "model": "Microsoft Surface Pro",
+  "brand": "Microsoft",
+  "specifications": {
+    "cpu": "Intel Core i5",
+    "ram": "8GB",
+    "storage": "256GB SSD",
+    "graphics": "Intel UHD Graphics"
+  },
+  "status": "Available",
+  "location": "LA Office",
+  "age": 1,
+  "condition": "Excellent",
+  "lastServiced": "2023-05-15"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1b6"
+  },
+  "serialNumber": "SN998877",
+  "model": "Asus ZenBook 14",
+  "brand": "Asus",
+  "specifications": {
+    "cpu": "AMD Ryzen 7",
+    "ram": "16GB",
+    "storage": "512GB SSD",
+    "graphics": "AMD Radeon Graphics"
+  },
+  "status": "Assigned",
+  "location": "SF Office",
+  "age": 2,
+  "condition": "Good",
+  "lastServiced": "2023-02-25"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1b7"
+  },
+  "serialNumber": "SN556677",
+  "model": "Acer Swift 3",
+  "brand": "Acer",
+  "specifications": {
+    "cpu": "Intel Core i5",
+    "ram": "8GB",
+    "storage": "256GB SSD",
+    "graphics": "Intel UHD Graphics"
+  },
+  "status": "Available",
+  "location": "NYC Office",
+  "age": 3,
+  "condition": "Fair",
+  "lastServiced": "2023-01-20"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1b8"
+  },
+  "serialNumber": "SN334455",
+  "model": "Dell Inspiron 15",
+  "brand": "Dell",
+  "specifications": {
+    "cpu": "Intel Core i3",
+    "ram": "4GB",
+    "storage": "128GB SSD",
+    "graphics": "Intel UHD Graphics"
+  },
+  "status": "In Service",
+  "location": "LA Office",
+  "age": 4,
+  "condition": "Good",
+  "lastServiced": "2023-03-30"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1b9"
+  },
+  "serialNumber": "SN221144",
+  "model": "HP Envy x360",
+  "brand": "HP",
+  "specifications": {
+    "cpu": "AMD Ryzen 5",
+    "ram": "8GB",
+    "storage": "256GB SSD",
+    "graphics": "AMD Radeon Graphics"
+  },
+  "status": "Available",
+  "location": "SF Office",
+  "age": 1,
+  "condition": "Excellent",
+  "lastServiced": "2023-05-01"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1ba"
+  },
+  "serialNumber": "SN667788",
+  "model": "Apple MacBook Air",
+  "brand": "Apple",
+  "specifications": {
+    "cpu": "Apple M1",
+    "ram": "8GB",
+    "storage": "256GB SSD",
+    "graphics": "Apple M1"
+  },
+  "status": "Assigned",
+  "location": "NYC Office",
+  "age": 2,
+  "condition": "Good",
+  "lastServiced": "2023-02-10"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1bb"
+  },
+  "serialNumber": "SN998866",
+  "model": "Lenovo Yoga 730",
+  "brand": "Lenovo",
+  "specifications": {
+    "cpu": "Intel Core i7",
+    "ram": "16GB",
+    "storage": "512GB SSD",
+    "graphics": "Intel UHD Graphics"
+  },
+  "status": "Available",
+  "location": "LA Office",
+  "age": 3,
+  "condition": "Fair",
+  "lastServiced": "2023-01-25"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1bc"
+  },
+  "serialNumber": "SN112244",
+  "model": "Microsoft Surface Laptop",
+  "brand": "Microsoft",
+  "specifications": {
+    "cpu": "Intel Core i5",
+    "ram": "8GB",
+    "storage": "256GB SSD",
+    "graphics": "Intel UHD Graphics"
+  },
+  "status": "In Service",
+  "location": "SF Office",
+  "age": 4,
+  "condition": "Good",
+  "lastServiced": "2023-04-05"
+}]

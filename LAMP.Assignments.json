@@ -1,0 +1,120 @@
+[{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1c1"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1a1",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1b1",
+  "assignedDate": "2023-01-15",
+  "returnedDate": "2023-03-15",
+  "status": "Returned"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1c2"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1a2",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1b2",
+  "assignedDate": "2023-07-10",
+  "returnedDate": null,
+  "status": "Active"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1c3"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1a3",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1b3",
+  "assignedDate": "2023-05-05",
+  "returnedDate": "2023-07-15",
+  "status": "Returned"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1c4"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1a4",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1b4",
+  "assignedDate": "2023-06-01",
+  "returnedDate": "2023-07-01",
+  "status": "Returned"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1c5"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1a5",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1b5",
+  "assignedDate": "2023-07-25",
+  "returnedDate": null,
+  "status": "Active"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1c6"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1a6",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1b6",
+  "assignedDate": "2023-06-15",
+  "returnedDate": null,
+  "status": "Active"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1c7"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1a7",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1b7",
+  "assignedDate": "2023-05-10",
+  "returnedDate": "2023-07-10",
+  "status": "Returned"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1c8"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1a8",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1b8",
+  "assignedDate": "2023-06-20",
+  "returnedDate": null,
+  "status": "Active"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1c9"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1a9",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1b9",
+  "assignedDate": "2023-07-05",
+  "returnedDate": null,
+  "status": "Active"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1ca"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1aa",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1ba",
+  "assignedDate": "2023-06-15",
+  "returnedDate": null,
+  "status": "Active"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1cb"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1ab",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1bb",
+  "assignedDate": "2023-05-25",
+  "returnedDate": null,
+  "status": "Active"
+},
+{
+  "_id": {
+    "$oid": "64cba6eaf1f0e4a9d5f1c1cc"
+  },
+  "employeeId": "64cba6eaf1f0e4a9d5f1c1ac",
+  "laptopId": "64cba6eaf1f0e4a9d5f1c1bc",
+  "assignedDate": "2023-07-01",
+  "returnedDate": "2023-07-15",
+  "status": "Returned"
+}]
