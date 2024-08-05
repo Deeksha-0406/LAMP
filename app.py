@@ -4,13 +4,14 @@ import pandas as pd
 from bson import ObjectId
 from config import get_db
 from datetime import datetime
+import numpy as np
 
 app = Flask(__name__)
 
 # Load the model and encoders
 try:
     with open('laptop_recommendation_model.pkl', 'rb') as file:
-        model, label_encoders = pickle.load(file)
+        model, label_encoders, id_mapping = pickle.load(file)
 except Exception as e:
     print(f"Error loading model and encoders: {e}")
     raise
@@ -21,52 +22,58 @@ db = get_db()
 @app.route('/api/recommendations', methods=['POST'])
 def recommend_laptop():
     try:
-        data = request.get_json()  # Use get_json() for JSON request
-        employee_name = data.get('name')
+        data = request.get_json()
         
-        if not employee_name:
-            return jsonify({"error": "Employee name is required"}), 400
+        # Get laptop requirements from the request
+        requirements = {
+            'cpu': data.get('cpu', ''),
+            'ram': data.get('ram', ''),
+            'storage': data.get('storage', '')
+        }
         
-        # Fetch employee details
-        employee = db.Employees.find_one({"name": employee_name})
-        if not employee:
-            return jsonify({"error": "Employee not found"}), 404
+        # Convert requirements to DataFrame
+        requirements_df = pd.DataFrame([requirements])
         
-        # Check for reserved laptops
-        reservation = db.Reservations.find_one({"employeeId": str(employee["_id"]), "status": "Reserved"})
-        if reservation:
-            recommended_laptop = db.Laptops.find_one({"_id": ObjectId(reservation["laptopId"])})
-            # Update reservation status to active
-            db.Reservations.update_one({"_id": reservation["_id"]}, {"$set": {"status": "Active"}})
-        else:
-            # Prepare employee data for prediction
-            laptop = db.Laptops.find_one({"status": "Available"})
-            if not laptop:
-                return jsonify({"error": "No available laptop found"}), 404
-            
-            employee_features = {
-                'role': employee.get('role', ''),
-                'experienceLevel': employee.get('experienceLevel', ''),
-                'age': employee.get('age', 0),
-                'cpu': laptop['specifications'].get('cpu', ''),
-                'ram': laptop['specifications'].get('ram', ''),
-                'storage': laptop['specifications'].get('storage', ''),
-                'graphics': laptop['specifications'].get('graphics', '')
-            }
-            
-            # Convert employee_features to DataFrame
-            employee_df = pd.DataFrame([employee_features])
-            
-            # Encode categorical data
-            for column in employee_df.select_dtypes(include=['object']).columns:
-                if column in label_encoders:
-                    employee_df[column] = label_encoders[column].transform(employee_df[column])
-                else:
-                    employee_df[column] = employee_df[column].astype(str)
-            
-            # Predict the best laptop
-            prediction = model.predict(employee_df)[0]
-            recommended_laptop = db.Laptops.find_one({"_id": ObjectId(prediction)})
+        # Replace empty strings with NaN
+        requirements_df.replace('', np.nan, inplace=True)
+        
+        # Ensure that 'cpu', 'ram', and 'storage' are numeric
+        requirements_df['cpu'] = pd.to_numeric(requirements_df['cpu'], errors='coerce')
+        requirements_df['ram'] = pd.to_numeric(requirements_df['ram'], errors='coerce')
+        requirements_df['storage'] = pd.to_numeric(requirements_df['storage'], errors='coerce')
+        
+        # Fill NaN with 0 or another appropriate value
+        requirements_df.fillna(0, inplace=True)
+        
+        # Encode categorical data
+        for column in requirements_df.columns:
+            if column in label_encoders:
+                le = label_encoders[column]
+                requirements_df[column] = requirements_df[column].apply(lambda x: le.transform([x])[0] if pd.notna(x) and x in le.classes_ else -1)
+        
+        # Ensure all columns are of the correct type
+        for column in requirements_df.columns:
+            if column in label_encoders:
+                requirements_df[column] = requirements_df[column].astype(int)
+            else:
+                requirements_df[column] = requirements_df[column].astype(float)
+        
+        # Predict the best laptop
+        prediction = model.predict(requirements_df)[0]
+        
+        # Map prediction integer to ObjectId string
+        laptop_id = id_mapping.get(prediction, None)
+        if not laptop_id:
+            return jsonify({"error": "No laptop found for the recommendation"}), 404
+        
+        # Ensure laptop_id is a valid ObjectId
+        try:
+            predicted_laptop_id = ObjectId(laptop_id)
+        except Exception as e:
+            return jsonify({"error": f"Invalid laptop ID format: {laptop_id}"}), 400
+        
+        # Fetch the recommended laptop from the database
+        recommended_laptop = db.Laptops.find_one({"_id": predicted_laptop_id})
         
         if not recommended_laptop:
             return jsonify({"error": "No laptop found for the recommendation"}), 404
@@ -79,7 +86,7 @@ def recommend_laptop():
         
         # Create a new assignment entry
         new_assignment = {
-            "employeeId": str(employee["_id"]),
+            "employeeId": None,  # No employee associated for this request
             "laptopId": str(recommended_laptop["_id"]),
             "assignedDate": datetime.utcnow(),
             "returnedDate": None,
@@ -98,12 +105,12 @@ def recommend_laptop():
     
     except Exception as e:
         print(f"Error in /api/recommendations: {e}")
-        return jsonify({"error": "An internal error occurred"}), 500
+        return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
 
 @app.route('/api/reserve', methods=['POST'])
 def reserve_laptop():
     try:
-        data = request.get_json()  # Use get_json() for JSON request
+        data = request.get_json()
         employee_name = data.get('name')
         laptop_id = data.get('laptopId')
         
@@ -115,8 +122,14 @@ def reserve_laptop():
         if not employee:
             return jsonify({"error": "Employee not found"}), 404
         
+        # Ensure laptop_id is a valid ObjectId
+        try:
+            laptop_id = ObjectId(laptop_id)
+        except Exception as e:
+            return jsonify({"error": f"Invalid laptop ID format: {laptop_id}"}), 400
+        
         # Fetch laptop details
-        laptop = db.Laptops.find_one({"_id": ObjectId(laptop_id)})
+        laptop = db.Laptops.find_one({"_id": laptop_id})
         if not laptop:
             return jsonify({"error": "Laptop not found"}), 404
         
@@ -143,7 +156,7 @@ def reserve_laptop():
     
     except Exception as e:
         print(f"Error in /api/reserve: {e}")
-        return jsonify({"error": "An internal error occurred"}), 500
+        return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
