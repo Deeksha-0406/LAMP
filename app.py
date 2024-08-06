@@ -5,6 +5,7 @@ from bson import ObjectId
 from config import get_db
 from datetime import datetime
 import numpy as np
+from sklearn.linear_model import LinearRegression
 
 app = Flask(__name__)
 
@@ -15,6 +16,16 @@ try:
 except Exception as e:
     print(f"Error loading model and encoders: {e}")
     raise
+
+# Load the demand forecasting model
+def load_demand_model():
+    try:
+        with open('laptop_demand_model.pkl', 'rb') as file:
+            demand_model = pickle.load(file)
+        return demand_model
+    except Exception as e:
+        print(f"Error loading demand forecasting model: {e}")
+        return None
 
 # Connect to MongoDB
 db = get_db()
@@ -156,6 +167,155 @@ def reserve_laptop():
     
     except Exception as e:
         print(f"Error in /api/reserve: {e}")
+        return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
+
+@app.route('/api/onboard', methods=['POST'])
+def onboard_new_hire():
+    try:
+        data = request.get_json()
+        new_employee = {
+            '_id': data.get('_id'),
+            'cpu': data.get('cpu'),
+            'ram': data.get('ram'),
+            'storage': data.get('storage')
+        }
+        
+        if not new_employee['_id'] or not new_employee['cpu'] or not new_employee['ram'] or not new_employee['storage']:
+            return jsonify({"error": "Employee ID, cpu, ram, and storage are required"}), 400
+        
+        # Extract relevant details for prediction
+        employee_details = {
+            'cpu': new_employee['cpu'],
+            'ram': new_employee['ram'],
+            'storage': new_employee['storage']
+        }
+        
+        # Convert to DataFrame
+        employee_df = pd.DataFrame([employee_details])
+        
+        # Encode the details
+        for column, le in label_encoders.items():
+            if column in employee_df.columns:
+                employee_df[column] = employee_df[column].apply(lambda x: le.transform([x])[0] if pd.notna(x) and x in le.classes_ else -1)
+        
+        # Ensure all columns are of the correct type
+        for column in employee_df.columns:
+            if column in label_encoders:
+                employee_df[column] = employee_df[column].astype(int)
+            else:
+                employee_df[column] = employee_df[column].astype(float)
+        
+        # Predict the laptop
+        predicted_laptop_idx = model.predict(employee_df)[0]
+        predicted_laptop_id = id_mapping[predicted_laptop_idx]
+        
+        # Ensure laptop_id is a valid ObjectId
+        try:
+            predicted_laptop_id = ObjectId(predicted_laptop_id)
+        except Exception as e:
+            return jsonify({"error": f"Invalid laptop ID format: {predicted_laptop_id}"}), 400
+        
+        # Check the availability of the recommended laptop
+        laptop = db.Laptops.find_one({"_id": predicted_laptop_id, "status": "Available"})
+        
+        if laptop:
+            # Assign the laptop to the new hire
+            db.Assignments.insert_one({
+                "employeeId": new_employee['_id'],
+                "laptopId": str(predicted_laptop_id),
+                "status": "Active",
+                "assignedDate": datetime.utcnow()
+            })
+            
+            # Update the laptop status
+            db.Laptops.update_one({"_id": predicted_laptop_id}, {"$set": {"status": "Assigned"}})
+            
+            return jsonify({
+                "message": f"Laptop {predicted_laptop_id} assigned to employee {new_employee['_id']}.",
+                "laptop": {
+                    "serialNumber": laptop['serialNumber'],
+                    "model": laptop['model'],
+                    "brand": laptop['brand'],
+                    "specifications": laptop['specifications']
+                }
+            })
+        else:
+            return jsonify({"error": "No available laptops match the criteria for the new hire."}), 404
+    
+    except Exception as e:
+        print(f"Error in /api/onboard: {e}")
+        return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
+
+@app.route('/api/offboard', methods=['POST'])
+def offboard_employee():
+    try:
+        data = request.get_json()
+        employee_id = data.get('employeeId')
+        
+        if not employee_id:
+            return jsonify({"error": "Employee ID is required"}), 400
+        
+        # Find all active assignments for the employee
+        active_assignments = db.Assignments.find({"employeeId": employee_id, "status": "Active"})
+        
+        if not active_assignments:
+            return jsonify({"message": "No active assignments found for this employee"}), 404
+        
+        for assignment in active_assignments:
+            laptop_id = ObjectId(assignment['laptopId'])
+            
+            # Fetch the laptop details
+            laptop = db.Laptops.find_one({"_id": laptop_id})
+            
+            if not laptop:
+                continue
+            
+            # Update the assignment with the return date
+            db.Assignments.update_one(
+                {"_id": assignment["_id"]},
+                {"$set": {"returnedDate": datetime.utcnow(), "status": "Returned"}}
+            )
+            
+            # Update the laptop status to available
+            db.Laptops.update_one(
+                {"_id": laptop["_id"]},
+                {"$set": {"status": "Available"}}
+            )
+        
+        return jsonify({"message": "Employee offboarding processed successfully"})
+    
+    except Exception as e:
+        print(f"Error in /api/offboard: {e}")
+        return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
+
+@app.route('/api/forecast_demand', methods=['GET'])
+def forecast_laptop_demand():
+    try:
+        demand_model = load_demand_model()
+        if not demand_model:
+            return jsonify({"error": "Demand forecasting model not available."}), 500
+        
+        # Generate future periods
+        historical_data = list(db.Assignments.find({"status": "Active"}))
+        historical_df = pd.DataFrame(historical_data)
+        historical_df['assignedDate'] = pd.to_datetime(historical_df['assignedDate'])
+        historical_df['month'] = historical_df['assignedDate'].dt.to_period('M')
+        demand_df = historical_df.groupby(['month', 'laptopId']).size().reset_index(name='demand')
+        demand_pivot = demand_df.pivot(index='month', columns='laptopId', values='demand').fillna(0)
+        future_periods = np.arange(len(demand_pivot) + 12).reshape(-1, 1)  # Forecast for 12 periods ahead
+        
+        # Predict future demand
+        predicted_demand = demand_model.predict(future_periods)
+        
+        # Prepare results
+        demand_forecast = {}
+        for idx, laptop_id in enumerate(demand_pivot.columns):
+            demand_forecast[str(laptop_id)] = predicted_demand[:, idx].tolist()
+        
+        return jsonify({"demandForecast": demand_forecast})
+    
+    except Exception as e:
+        print(f"Error in /api/forecast_demand: {e}")
         return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
 
 if __name__ == '__main__':
