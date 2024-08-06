@@ -6,15 +6,19 @@ from config import get_db
 from datetime import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
+import logging
 
 app = Flask(__name__)
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Load the model and encoders
 try:
     with open('laptop_recommendation_model.pkl', 'rb') as file:
         model, label_encoders, id_mapping = pickle.load(file)
 except Exception as e:
-    print(f"Error loading model and encoders: {e}")
+    logging.error(f"Error loading model and encoders: {e}")
     raise
 
 # Load the demand forecasting model
@@ -24,7 +28,7 @@ def load_demand_model():
             demand_model = pickle.load(file)
         return demand_model
     except Exception as e:
-        print(f"Error loading demand forecasting model: {e}")
+        logging.error(f"Error loading demand forecasting model: {e}")
         return None
 
 # Connect to MongoDB
@@ -90,10 +94,12 @@ def recommend_laptop():
             return jsonify({"error": "No laptop found for the recommendation"}), 404
         
         # Update laptop status
-        db.Laptops.update_one(
+        result = db.Laptops.update_one(
             {"_id": recommended_laptop["_id"]},
             {"$set": {"status": "Assigned"}}
         )
+        if result.modified_count == 0:
+            logging.warning(f"Laptop with ID {predicted_laptop_id} was not updated.")
         
         # Create a new assignment entry
         new_assignment = {
@@ -115,7 +121,7 @@ def recommend_laptop():
         })
     
     except Exception as e:
-        print(f"Error in /api/recommendations: {e}")
+        logging.error(f"Error in /api/recommendations: {e}")
         return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
 
 @app.route('/api/reserve', methods=['POST'])
@@ -155,18 +161,22 @@ def reserve_laptop():
             "reservedDate": datetime.utcnow(),
             "status": "Reserved"
         }
-        db.Reservations.insert_one(new_reservation)
+        result = db.Reservations.insert_one(new_reservation)
+        if result.inserted_id is None:
+            logging.warning("Reservation entry was not created.")
         
         # Update laptop status to reserved
-        db.Laptops.update_one(
+        result = db.Laptops.update_one(
             {"_id": laptop["_id"]},
             {"$set": {"status": "Reserved"}}
         )
+        if result.modified_count == 0:
+            logging.warning(f"Laptop with ID {laptop_id} was not updated.")
         
         return jsonify({"message": "Laptop reserved successfully"})
     
     except Exception as e:
-        print(f"Error in /api/reserve: {e}")
+        logging.error(f"Error in /api/reserve: {e}")
         return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
 
 @app.route('/api/onboard', methods=['POST'])
@@ -209,6 +219,10 @@ def onboard_new_hire():
         predicted_laptop_idx = model.predict(employee_df)[0]
         predicted_laptop_id = id_mapping[predicted_laptop_idx]
         
+        # Debugging information
+        logging.debug(f"Predicted laptop index: {predicted_laptop_idx}")
+        logging.debug(f"Predicted laptop ID: {predicted_laptop_id}")
+        
         # Ensure laptop_id is a valid ObjectId
         try:
             predicted_laptop_id = ObjectId(predicted_laptop_id)
@@ -218,17 +232,24 @@ def onboard_new_hire():
         # Check the availability of the recommended laptop
         laptop = db.Laptops.find_one({"_id": predicted_laptop_id, "status": "Available"})
         
+        # Debugging information
+        logging.debug(f"Laptop found: {laptop}")
+        
         if laptop:
             # Assign the laptop to the new hire
-            db.Assignments.insert_one({
+            result = db.Assignments.insert_one({
                 "employeeId": new_employee['_id'],
                 "laptopId": str(predicted_laptop_id),
                 "status": "Active",
                 "assignedDate": datetime.utcnow()
             })
+            if result.inserted_id is None:
+                logging.warning("Assignment entry was not created.")
             
             # Update the laptop status
-            db.Laptops.update_one({"_id": predicted_laptop_id}, {"$set": {"status": "Assigned"}})
+            result = db.Laptops.update_one({"_id": predicted_laptop_id}, {"$set": {"status": "Assigned"}})
+            if result.modified_count == 0:
+                logging.warning(f"Laptop with ID {predicted_laptop_id} was not updated.")
             
             return jsonify({
                 "message": f"Laptop {predicted_laptop_id} assigned to employee {new_employee['_id']}.",
@@ -243,7 +264,7 @@ def onboard_new_hire():
             return jsonify({"error": "No available laptops match the criteria for the new hire."}), 404
     
     except Exception as e:
-        print(f"Error in /api/onboard: {e}")
+        logging.error(f"Error in /api/onboard: {e}")
         return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
 
 @app.route('/api/offboard', methods=['POST'])
@@ -256,36 +277,40 @@ def offboard_employee():
             return jsonify({"error": "Employee ID is required"}), 400
         
         # Find all active assignments for the employee
-        active_assignments = db.Assignments.find({"employeeId": employee_id, "status": "Active"})
-        
+        active_assignments = list(db.Assignments.find({"employeeId": employee_id, "status": "Active"}))
         if not active_assignments:
             return jsonify({"message": "No active assignments found for this employee"}), 404
         
         for assignment in active_assignments:
-            laptop_id = ObjectId(assignment['laptopId'])
+            try:
+                laptop_id = ObjectId(assignment['laptopId'])
+                laptop = db.Laptops.find_one({"_id": laptop_id})
+                
+                if not laptop:
+                    logging.warning(f"Laptop with ID {laptop_id} not found.")
+                    continue
+                
+                result = db.Assignments.update_one(
+                    {"_id": assignment["_id"]},
+                    {"$set": {"returnedDate": datetime.utcnow(), "status": "Returned"}}
+                )
+                if result.matched_count == 0:
+                    logging.warning(f"Assignment with ID {assignment['_id']} not found for update.")
+                
+                result = db.Laptops.update_one(
+                    {"_id": laptop["_id"]},
+                    {"$set": {"status": "Available"}}
+                )
+                if result.matched_count == 0:
+                    logging.warning(f"Laptop with ID {laptop['_id']} not found for update.")
             
-            # Fetch the laptop details
-            laptop = db.Laptops.find_one({"_id": laptop_id})
-            
-            if not laptop:
-                continue
-            
-            # Update the assignment with the return date
-            db.Assignments.update_one(
-                {"_id": assignment["_id"]},
-                {"$set": {"returnedDate": datetime.utcnow(), "status": "Returned"}}
-            )
-            
-            # Update the laptop status to available
-            db.Laptops.update_one(
-                {"_id": laptop["_id"]},
-                {"$set": {"status": "Available"}}
-            )
+            except Exception as e:
+                logging.error(f"Error updating assignment or laptop: {e}")
         
         return jsonify({"message": "Employee offboarding processed successfully"})
     
     except Exception as e:
-        print(f"Error in /api/offboard: {e}")
+        logging.error(f"Error in /api/offboard: {e}")
         return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
 
 @app.route('/api/forecast_demand', methods=['GET'])
@@ -315,7 +340,7 @@ def forecast_laptop_demand():
         return jsonify({"demandForecast": demand_forecast})
     
     except Exception as e:
-        print(f"Error in /api/forecast_demand: {e}")
+        logging.error(f"Error in /api/forecast_demand: {e}")
         return jsonify({"error": f"An internal error occurred: {str(e)}"}), 500
 
 if __name__ == '__main__':
