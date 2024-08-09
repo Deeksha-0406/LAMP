@@ -1,0 +1,35 @@
+.header {
+    background-color: #052f9a;
+    color: rgb(250, 250, 250);
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-button {
+    background-color: #EF4123;
+    color: rgb(9, 9, 9);
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s ease;
+    border-radius: 10px;
+  }
+  
+  .nav-button:hover {
+    background-color: #D7371F; /* Slightly darker shade for hover effect */
+  }
+  
+  .nav-button:focus {
+    outline: none;
+  }
+  

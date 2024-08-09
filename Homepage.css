@@ -1,0 +1,81 @@
+.home-page {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(to right, #f8f9fa, #e9ecef);
+  }
+ 
+  .home-header {
+    margin-bottom: 30px;
+  }
+ 
+  .home-header h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
+ 
+  .home-header p {
+    font-size: 1.2rem;
+    color: #666;
+  }
+ 
+  .home-features {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 0 10px;
+  }
+ 
+  .feature-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+ 
+  .feature-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  }
+ 
+  .icon-container {
+    background: #3b29df;
+    color: white;
+    padding: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-bottom: 15px;
+  }
+ 
+  .feature-card h2 {
+    margin: 10px 0;
+    font-size: 1.8rem;
+    color: #333;
+  }
+ 
+  .feature-card p {
+    color: #666;
+  }
+ 
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    background-color: #4b48ef;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+ 
+  .btn:hover {
+    background-color: #cb7e40;
+  }
+ 
+  /* Font Awesome (for icons) */
+  @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+ 

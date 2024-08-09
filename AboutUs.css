@@ -1,0 +1,49 @@
+.about-us {
+    padding: 20px;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+  }
+ 
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+ 
+  section {
+    margin-bottom: 40px;
+  }
+ 
+  .mission, .team, .contact {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+ 
+  .team-member {
+    margin-bottom: 20px;
+  }
+ 
+  .team-member h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #333;
+  }
+ 
+  .team-member p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #555;
+  }
+ 
+  .contact a {
+    color: #007bff;
+    text-decoration: none;
+  }
+ 
+  .contact a:hover {
+    text-decoration: underline;
+  }
+ 

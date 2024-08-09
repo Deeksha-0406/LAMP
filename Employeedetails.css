@@ -1,0 +1,121 @@
+.employee-details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f4f4;
+    padding: 20px;
+  }
+ 
+  .details-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+  }
+ 
+  .employee-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+ 
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+ 
+  .info-item i {
+    color: #007bff;
+  }
+ 
+  .info-text {
+    display: flex;
+    flex-direction: column;
+  }
+ 
+  .info-text h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+  }
+ 
+  .info-text p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #555;
+  }
+ 
+  .info-text a {
+    color: #007bff;
+    text-decoration: none;
+  }
+ 
+  .info-text a:hover {
+    text-decoration: underline;
+  }
+ 
+  .employee-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between cards */
+    padding: 20px;
+  }
+  
+  .details-card {
+    flex: 1 1 calc(33.333% - 40px); /* Adjust card width */
+    box-sizing: border-box;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 300px; /* Maximum card width */
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .info-item i {
+    margin-right: 10px;
+    color: #333;
+  }
+  
+  .info-text {
+    font-size: 16px;
+  }
+  
+  h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+  
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 768px) {
+    .details-card {
+      flex: 1 1 calc(50% - 40px); /* 2 cards per row on small screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .details-card {
+      flex: 1 1 100%; /* 1 card per row on extra small screens */
+    }
+  }
+  
